@@ -12,7 +12,8 @@ def render_treemap(df):
         color='TotalIngresos',
         color_continuous_scale='Blues'
     )
-    st.plotly_chart(fig, use_container_width=True)
+    # Cambiado use_container_width=True por width="stretch"
+    st.plotly_chart(fig, width="stretch")
 
 def render_demographics(df):
     st.subheader("Distribución por Edad y Género")
@@ -24,7 +25,8 @@ def render_demographics(df):
         nbins=20,
         labels={'Age': 'Edad', 'count': 'Número de Pacientes'}
     )
-    st.plotly_chart(fig, use_container_width=True)
+    # Cambiado use_container_width=True por width="stretch"
+    st.plotly_chart(fig, width="stretch")
 
 def render_comorbidities(df):
     st.subheader("Prevalencia de Comorbilidades")
@@ -33,4 +35,5 @@ def render_comorbidities(df):
     counts.columns = ['Comorbilidad', 'Casos']
     
     fig = px.bar(counts, x='Casos', y='Comorbilidad', orientation='h', color='Casos', color_continuous_scale='Reds')
-    st.plotly_chart(fig, use_container_width=True)
+    # Cambiado use_container_width=True por width="stretch"
+    st.plotly_chart(fig, width="stretch")
