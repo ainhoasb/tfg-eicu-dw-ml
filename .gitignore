@@ -9,3 +9,5 @@ __pycache__/
 
 # Variables de entorno (¡nunca subas contraseñas!)
 .env
+
+config.yml
