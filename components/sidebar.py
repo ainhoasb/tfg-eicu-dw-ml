@@ -95,6 +95,7 @@ def render_sidebar(df_general):
         "years": selected_years,
         "genders": selected_genders,
         "age_range": selected_age_range,
+        "ethnicities": selected_ethnicities,
         "regions": selected_regions,
         "units": selected_units
     }

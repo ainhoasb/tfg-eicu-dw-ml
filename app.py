@@ -14,13 +14,16 @@ df_general, df_vitals, df_bp = load_dw_data()
 filters = render_sidebar(df_general)
 
 # 3. Aplicar Filtros Globales
-df_filtered = df_general[
-    (df_general['AdmitYear'].isin(filters['years'])) &
-    (df_general['Gender'].isin(filters['genders'])) &
-    (df_general['Age'].between(filters['age_range'][0], filters['age_range'][1])) &
-    (df_general['Region'].isin(filters['regions'])) &
-    (df_general['UnitType'].isin(filters['units']))
-]
+mask = (
+    df_general['AdmitYear'].isin(filters['years']) &
+    df_general['Gender'].fillna('').astype(str).str.strip().isin(filters['genders']) &
+    df_general['Ethnicity'].fillna('').astype(str).str.strip().isin(filters['ethnicities']) &
+    df_general['Age'].between(filters['age_range'][0], filters['age_range'][1]) &
+    df_general['Region'].isin(filters['regions']) &
+    df_general['UnitType'].isin(filters['units'])
+)
+
+df_filtered = df_general[mask]
 
 # Filtrado en cascada para tablas secundarias
 valid_stays = df_filtered['PatientUnitStayID'].dropna().unique()
