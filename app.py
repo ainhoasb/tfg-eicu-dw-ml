@@ -3,7 +3,7 @@ from database import load_dw_data
 from components.sidebar import render_sidebar
 from components.kpis import render_kpis
 from components.charts_general import render_treemap, render_demographics, render_comorbidities
-from components.charts_vitals import render_vitals_distribution, render_bp_scatter
+from components.charts_vitals import render_vitals_distribution, render_bp_scatter, render_vitals_boxplots
 
 st.set_page_config(page_title="Dashboard Clínico - TFG", layout="wide")
 
@@ -92,6 +92,8 @@ with tab_dw:
         render_vitals_distribution(df_vitals_filtered)
     with col32:
         render_bp_scatter(df_bp_filtered)
+
+    render_vitals_boxplots(df_vitals_filtered)
 
 # ==========================================
 # PESTAÑA 3: DATA MINING
