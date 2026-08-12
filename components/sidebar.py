@@ -54,6 +54,17 @@ def render_sidebar(df_general):
 
         st.divider()
 
+        # Filtro de Etnicidad
+        st.subheader("🌍 Etnicidad")
+        available_ethnicities = sorted(df_general['Ethnicity'].dropna().unique())
+        selected_ethnicities = st.multiselect(
+            "Seleccionar etnicidad:",
+            options=available_ethnicities,
+            default=available_ethnicities
+        )
+
+        st.divider()
+
         # Filtro por Rango de Edad
         st.subheader("📅 Rango de Edad")
         min_age = int(df_general['Age'].min()) if not df_general['Age'].empty else 0
@@ -69,7 +80,7 @@ def render_sidebar(df_general):
         st.divider()
 
         # Filtro por Región y Tipo de Unidad
-        st.subheader("🌍 Ubicación y Servicio")
+        st.subheader("📍 Ubicación y Servicio")
         regions = sorted(df_general['Region'].dropna().unique())
         selected_regions = st.multiselect("Región", regions, default=regions)
 
