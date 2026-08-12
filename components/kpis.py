@@ -22,6 +22,7 @@ def get_kpi_color(value, low_threshold, high_threshold, reverse=False):
 
 def render_kpis(df):
     total_ingresos = len(df)
+    total_fallecidos = int(df['DiedInHospital'].sum())
     mortalidad = (df['DiedInHospital'].sum() / total_ingresos * 100) if total_ingresos > 0 else 0
     apache_avg = df['ApacheScore'].mean() if total_ingresos > 0 else 0
     vent_pct = (df['Vent'].sum() / total_ingresos * 100) if total_ingresos > 0 else 0
@@ -33,7 +34,7 @@ def render_kpis(df):
 
     st.markdown("### Indicadores Clave del Resumen Clínico")
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     card_base = (
         "border-radius: 12px; "
@@ -76,5 +77,15 @@ def render_kpis(df):
                 <div style="color: #6b7280; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Ventilación Mecánica</div>
                 <div style="color: {color_vent}; font-size: 2.3rem; font-weight: 800; margin: 6px 0;">{vent_pct:.1f}%</div>
                 <div style="color: {color_vent}; font-size: 0.8rem; font-weight: 600;">Soporte {tag_vent}</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+    with col5:
+        # Nueva tarjeta para Fallecidos, manteniendo el estilo blanco pero con borde gris pizarra (#475569)
+        st.markdown(f"""
+            <div style="{card_base} background-color: #ffffff; border: 1px solid #e5e7eb; border-left: 6px solid #475569;">
+                <div style="color: #6b7280; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Total Fallecidos</div>
+                <div style="color: #111827; font-size: 2.3rem; font-weight: 800; margin: 6px 0;">{total_fallecidos:,}</div>
+                <div style="color: #6b7280; font-size: 0.8rem; font-weight: 500;">Volumen total</div>
             </div>
         """, unsafe_allow_html=True)
