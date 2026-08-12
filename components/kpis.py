@@ -73,7 +73,7 @@ def render_kpis(df):
     with col4:
         st.markdown(f"""
             <div style="{card_base} background-color: {bg_vent}; border: 1px solid #e5e7eb; border-left: 6px solid {color_vent};">
-                <div style="color: #6b7280; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Ventilación</div>
+                <div style="color: #6b7280; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Ventilación Mecánica</div>
                 <div style="color: {color_vent}; font-size: 2.3rem; font-weight: 800; margin: 6px 0;">{vent_pct:.1f}%</div>
                 <div style="color: {color_vent}; font-size: 0.8rem; font-weight: 600;">Soporte {tag_vent}</div>
             </div>
