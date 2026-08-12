@@ -46,17 +46,21 @@ def render_sidebar(df_general):
 
         # 2. Filtro de Género mediante Checkboxes
         st.subheader("👤 Género")
-        available_genders = sorted(df_general['Gender'].dropna().unique())
+        raw_genders = df_general['Gender'].dropna().astype(str).str.strip()
+        available_genders = sorted([g for g in raw_genders.unique() if g != ""])
+        
         selected_genders = []
         for gender in available_genders:
-            if st.checkbox(str(gender), value=True, key=f"gender_{gender}"):
+            if st.checkbox(gender, value=True, key=f"gender_{gender}"):
                 selected_genders.append(gender)
 
         st.divider()
 
         # Filtro de Etnicidad
         st.subheader("🌍 Etnicidad")
-        available_ethnicities = sorted(df_general['Ethnicity'].dropna().unique())
+        raw_ethnicities = df_general['Ethnicity'].dropna().astype(str).str.strip()
+        available_ethnicities = sorted([e for e in raw_ethnicities.unique() if e != ""])
+        
         selected_ethnicities = st.multiselect(
             "Seleccionar etnicidad:",
             options=available_ethnicities,
