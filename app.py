@@ -76,22 +76,21 @@ with tab_dw:
     render_kpis(df_filtered)
     st.divider()
 
-    # Renderizar Gráficas del DW
     render_treemap(df_filtered)
 
-    col1, col2 = st.columns(2)
-    with col1:
+    col21, col22 = st.columns(2)
+    with col21:
         render_demographics(df_filtered)
-    with col2:
+    with col22:
         render_comorbidities(df_filtered)
 
     st.divider()
     st.subheader("📈 Monitorización de Signos Vitales y Tensión Arterial")
 
-    col3, col4 = st.columns(2)
-    with col3:
+    col31, col32 = st.columns(2)
+    with col31:
         render_vitals_distribution(df_vitals_filtered)
-    with col4:
+    with col32:
         render_bp_scatter(df_bp_filtered)
 
 # ==========================================
