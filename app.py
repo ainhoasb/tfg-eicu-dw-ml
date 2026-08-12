@@ -1,40 +1,36 @@
 import streamlit as st
 from database import load_dw_data
+from components.sidebar import render_sidebar
 from components.kpis import render_kpis
 from components.charts_general import render_treemap, render_demographics, render_comorbidities
 from components.charts_vitals import render_vitals_distribution, render_bp_scatter
 
 st.set_page_config(page_title="Dashboard Clínico - TFG", layout="wide")
-st.title("📊 Plataforma de Analítica Clínica y Minería de Datos")
 
-# 1. Cargar Datos Globales
+# 1. Cargar Datos
 df_general, df_vitals, df_bp = load_dw_data()
 
-# 2. Barra Lateral de Filtros Globales
-st.sidebar.header("🔍 Filtros Globales")
+# 2. Renderizar Sidebar y Obtener Filtros
+filters = render_sidebar(df_general)
 
-years = sorted(df_general['AdmitYear'].dropna().unique())
-selected_years = st.sidebar.multiselect("Año de Ingreso", years, default=years)
-
-regions = sorted(df_general['Region'].dropna().unique())
-selected_regions = st.sidebar.multiselect("Región", regions, default=regions)
-
-unit_types = sorted(df_general['UnitType'].dropna().unique())
-selected_units = st.sidebar.multiselect("Tipo de Unidad", unit_types, default=unit_types)
-
-# 3. Aplicar Filtro Global
+# 3. Aplicar Filtros Globales
 df_filtered = df_general[
-    (df_general['AdmitYear'].isin(selected_years)) &
-    (df_general['Region'].isin(selected_regions)) &
-    (df_general['UnitType'].isin(selected_units))
+    (df_general['AdmitYear'].isin(filters['years'])) &
+    (df_general['Gender'].isin(filters['genders'])) &
+    (df_general['Age'].between(filters['age_range'][0], filters['age_range'][1])) &
+    (df_general['Region'].isin(filters['regions'])) &
+    (df_general['UnitType'].isin(filters['units']))
 ]
 
-# Filtrar tablas secundarias vinculando con los PatientUnitStayID filtrados
+# Filtrado en cascada para tablas secundarias
 valid_stays = df_filtered['PatientUnitStayID'].dropna().unique()
 df_vitals_filtered = df_vitals[df_vitals['PatientUnitStayID'].isin(valid_stays)]
 df_bp_filtered = df_bp[df_bp['PatientUnitStayID'].isin(valid_stays)]
 
-# 4. Definición de las Pestañas Principales
+# 4. Estructura de Pestañas
+st.title("📊 Plataforma de Analítica Clínica y Minería de Datos")
+
+# Definición de las Pestañas Principales
 tab_intro, tab_dw, tab_mining = st.tabs([
     "ℹ️ Introducción & Arquitectura",
     "🏥 Analítica Descriptiva", 
