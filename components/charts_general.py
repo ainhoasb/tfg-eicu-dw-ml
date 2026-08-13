@@ -73,3 +73,54 @@ def render_comorbidities(df):
     fig = px.bar(counts, x='Casos', y='Comorbilidad', orientation='h', color='Casos', color_continuous_scale='Reds')
     # Cambiado use_container_width=True por width="stretch"
     st.plotly_chart(fig, width="stretch")
+
+def render_top_diagnoses(df):
+    st.subheader("Top 10 Diagnósticos de Ingreso")
+
+    # Comprobamos que exista la columna de diagnósticos
+    if 'DiagnosisAdmission' not in df.columns or df.empty:
+        st.info("No hay datos de diagnósticos para la selección actual.")
+        return
+
+    # Limpiamos nulos y contamos las frecuencias
+    df_clean = df.dropna(subset=['DiagnosisAdmission']).copy()
+    
+    # Extraemos solo los 10 más frecuentes
+    top_10 = df_clean['DiagnosisAdmission'].value_counts().nlargest(10).reset_index()
+    top_10.columns = ['Diagnóstico', 'Total Pacientes']
+
+    if top_10.empty:
+        st.info("No hay diagnósticos registrados con los filtros actuales.")
+        return
+
+    # Creamos el gráfico de Donut (hole=0.45 crea el hueco central)
+    fig = px.pie(
+        top_10,
+        names='Diagnóstico',
+        values='Total Pacientes',
+        hole=0.45,
+        title="Causas principales de admisión en UCI",
+        color_discrete_sequence=px.colors.sequential.Teal  # Tonos clínicos
+    )
+
+    # Configuramos las etiquetas y el tooltip (hover)
+    fig.update_traces(
+        textposition='inside', 
+        textinfo='value+percent',
+        hovertemplate="<b>%{label}</b><br>Nº Ingresos: %{value}<br>Representa el %{percent} del Top 10"
+    )
+
+    # Movemos la leyenda debajo para que el donut se vea más grande
+    fig.update_layout(
+        margin=dict(t=40, b=10, l=10, r=10),
+        legend=dict(
+            orientation="h", 
+            yanchor="top", 
+            y=-0.1, 
+            xanchor="center", 
+            x=0.5,
+            font=dict(size=10)
+        )
+    )
+
+    st.plotly_chart(fig, use_container_width=True)

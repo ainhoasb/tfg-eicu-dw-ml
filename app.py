@@ -2,7 +2,7 @@ import streamlit as st
 from database import load_dw_data
 from components.sidebar import render_sidebar
 from components.kpis import render_kpis
-from components.charts_general import render_treemap, render_demographics, render_comorbidities
+from components.charts_general import render_treemap, render_demographics, render_comorbidities, render_top_diagnoses
 from components.charts_vitals import render_vitals_distribution, render_vitals_boxplots
 from components.charts_blood_pressure import render_bp_scatter
 st.set_page_config(page_title="Dashboard Clínico - TFG", layout="wide")
@@ -83,6 +83,8 @@ with tab_dw:
         render_demographics(df_filtered)
     with col22:
         render_comorbidities(df_filtered)
+
+    render_top_diagnoses(df_filtered)
 
     st.divider()    
 
