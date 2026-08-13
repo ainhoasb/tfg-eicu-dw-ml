@@ -1,57 +1,112 @@
 import streamlit as st
 from database import load_dw_data
+from components.sidebar import render_sidebar
 from components.kpis import render_kpis
-from components.charts_general import render_treemap, render_demographics, render_comorbidities
-from components.charts_vitals import render_vitals_distribution, render_bp_scatter
+from components.charts_general import render_treemap, render_demographics, render_comorbidities, render_top_diagnoses, render_admissions_vs_mortality
+from components.charts_treatment import  render_stay_vs_treatment_service
+from components.charts_vitals import render_vitals_distribution, render_vitals_boxplots
+from components.charts_blood_pressure import render_bp_scatter
+st.set_page_config(page_title="Dashboard Clínico - TFG", layout="wide")
 
-st.set_page_config(page_title="Dashboard DW Clínico - TFG", layout="wide")
-st.title("📊 Catálogo Analítico - Data Warehouse Clínico")
+# 1. Cargar Datos
+df_admitted, df_vitals, df_bp, df_treatments, df_diagnoses = load_dw_data()
 
-# 1. Cargar Datos Globales
-df_general, df_vitals, df_bp = load_dw_data()
+# 2. Renderizar Sidebar y Obtener Filtros
+filters = render_sidebar(df_admitted)
 
-# 2. Barra Lateral de Filtros Globales
-st.sidebar.header("🔍 Filtros Globales")
+# 3. Aplicar Filtros Globales
+mask = (
+    df_admitted['AdmitYear'].isin(filters['years']) &
+    df_admitted['Gender'].fillna('').astype(str).str.strip().isin(filters['genders']) &
+    df_admitted['Ethnicity'].fillna('').astype(str).str.strip().isin(filters['ethnicities']) &
+    df_admitted['Age'].between(filters['age_range'][0], filters['age_range'][1]) &
+    df_admitted['Region'].isin(filters['regions']) &
+    df_admitted['UnitType'].isin(filters['units'])
+)
 
-years = sorted(df_general['AdmitYear'].dropna().unique())
-selected_years = st.sidebar.multiselect("Año de Ingreso", years, default=years)
+df_filtered = df_admitted[mask]
 
-regions = sorted(df_general['Region'].dropna().unique())
-selected_regions = st.sidebar.multiselect("Región", regions, default=regions)
-
-unit_types = sorted(df_general['UnitType'].dropna().unique())
-selected_units = st.sidebar.multiselect("Tipo de Unidad", unit_types, default=unit_types)
-
-# 3. Aplicar Filtro Global
-df_filtered = df_general[
-    (df_general['AdmitYear'].isin(selected_years)) &
-    (df_general['Region'].isin(selected_regions)) &
-    (df_general['UnitType'].isin(selected_units))
-]
-
-# Filtrar tablas secundarias vinculando con los PatientUnitStayID filtrados
+# Filtrado en cascada para tablas secundarias
 valid_stays = df_filtered['PatientUnitStayID'].dropna().unique()
 df_vitals_filtered = df_vitals[df_vitals['PatientUnitStayID'].isin(valid_stays)]
 df_bp_filtered = df_bp[df_bp['PatientUnitStayID'].isin(valid_stays)]
+df_treatments_filtered = df_treatments[df_treatments['PatientUnitStayID'].isin(valid_stays)]
+df_diagnoses_filtered = df_diagnoses[df_diagnoses['PatientUnitStayID'].isin(valid_stays)]
 
-# 4. Renderizar KPIs
-render_kpis(df_filtered)
-st.divider()
+# 4. Estructura de Pestañas
+st.title("📊 Plataforma de Analítica Clínica y Minería de Datos")
 
-# 5. Renderizar Gráficas del DW
-render_treemap(df_filtered)
+# Definición de las Pestañas Principales
+tab_intro, tab_dw, tab_mining = st.tabs([
+    "ℹ️ Introducción & Arquitectura",
+    "🏥 Analítica Descriptiva", 
+    "💻 Minería de Datos"])
 
-col1, col2 = st.columns(2)
-with col1:
-    render_demographics(df_filtered)
-with col2:
-    render_comorbidities(df_filtered)
+# ==========================================
+# PESTAÑA 1: INTRODUCCIÓN Y CONTEXTO
+# ==========================================
+with tab_intro:
+    st.header("📌 Trabajo Fin de Grado: Dashboard y Analítica de Datos Clínicos")
+    
+    col_a, col_b = st.columns([2, 1])
+    
+    with col_a:
+        st.subheader("Objetivo del Proyecto")
+        st.write("""
+        Este proyecto abarca la **migración y escalado de un almacén de datos clínicos a la nube de Azure**, 
+        junto con el diseño de una capa semántica de vistas en SQL Server y la implementación de un 
+        dashboard interactivo en Python (Streamlit).
+        
+        La plataforma está dividida en dos bloques analíticos:
+        1. **Analítica Descriptiva (DW):** Exploración multidimensional de ingresos en UCI, demografía, comorbilidades y signos vitales.
+        2. **Analítica Predictiva (Data Mining):** Descubrimiento de patrones mediante modelos de machine learning.
+        """)
+        
+    with col_b:
+        st.subheader("🛠️ Tecnologías")
+        st.markdown("""
+        - **Data Warehouse:** Azure SQL / SQL Server
+        - **Frontend:** Streamlit
+        - **Visualización:** Plotly Express
+        - **Procesamiento:** Pandas & Python
+        """)
 
-st.divider()
-st.header("📈 Monitorización de Signos Vitales y Tensión Arterial")
+# ==========================================
+# PESTAÑA 2: DATA WAREHOUSE
+# ==========================================
+with tab_dw:
+    # Renderizar KPIs
+    render_kpis(df_filtered)
+    st.divider()
 
-col3, col4 = st.columns(2)
-with col3:
-    render_vitals_distribution(df_vitals_filtered)
-with col4:
+    render_treemap(df_filtered)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        render_demographics(df_filtered)
+    with col2:
+        render_comorbidities(df_filtered)
+
+    col3, col4 = st.columns(2)
+    with col3:
+        render_top_diagnoses(df_filtered)
+    with col4:
+        render_admissions_vs_mortality(df_filtered)
+
+    render_stay_vs_treatment_service(df_filtered, df_treatments_filtered)
+
+    st.divider()    
+
+    render_vitals_boxplots(df_vitals_filtered)
+
+    st.divider()  
+
     render_bp_scatter(df_bp_filtered)
+
+# ==========================================
+# PESTAÑA 3: DATA MINING
+# ==========================================
+with tab_mining:
+    st.header("🔬 Módulo de Minería de Datos y Modelos")
+    st.info("Esta sección contendrá los resultados del análisis de clústeres, reglas de asociación y modelos predictivos.")
+    # Aquí iremos añadiendo los componentes de Data Mining más adelante

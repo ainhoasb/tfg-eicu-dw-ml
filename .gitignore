@@ -2,6 +2,7 @@
 venv/
 env/
 venv_tfg/
+images/
 
 # Archivos de caché de Python
 __pycache__/
