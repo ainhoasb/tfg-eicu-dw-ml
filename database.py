@@ -23,9 +23,11 @@ def load_dw_data():
     conn = get_connection()
     
     # Añadimos TOP 5000 para no colapsar la RAM durante la fase de pruebas
-    df_general = pd.read_sql("SELECT TOP 5000 * FROM vw_Dashboard_General", conn)
+    df_admitted = pd.read_sql("SELECT TOP 5000 * FROM vw_Dashboard_AdmittedToICU", conn)
     df_vitals = pd.read_sql("SELECT TOP 5000 * FROM vw_Dashboard_VitalMeasures", conn)
     df_bp = pd.read_sql("SELECT TOP 5000 * FROM vw_Dashboard_BloodPressure", conn)
+    df_treatments = pd.read_sql("SELECT TOP 5000 * FROM vw_Dashboard_Treatments", conn)
+    df_diagnoses = pd.read_sql("SELECT TOP 5000 * FROM vw_Dashboard_Diagnoses", conn)
     
     conn.close()
-    return df_general, df_vitals, df_bp
+    return df_admitted, df_vitals, df_bp, df_treatments, df_diagnoses

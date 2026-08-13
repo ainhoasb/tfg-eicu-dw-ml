@@ -3,32 +3,35 @@ from database import load_dw_data
 from components.sidebar import render_sidebar
 from components.kpis import render_kpis
 from components.charts_general import render_treemap, render_demographics, render_comorbidities, render_top_diagnoses, render_admissions_vs_mortality
+from components.charts_treatment import  render_stay_vs_treatment_service
 from components.charts_vitals import render_vitals_distribution, render_vitals_boxplots
 from components.charts_blood_pressure import render_bp_scatter
 st.set_page_config(page_title="Dashboard Clínico - TFG", layout="wide")
 
 # 1. Cargar Datos
-df_general, df_vitals, df_bp = load_dw_data()
+df_admitted, df_vitals, df_bp, df_treatments, df_diagnoses = load_dw_data()
 
 # 2. Renderizar Sidebar y Obtener Filtros
-filters = render_sidebar(df_general)
+filters = render_sidebar(df_admitted)
 
 # 3. Aplicar Filtros Globales
 mask = (
-    df_general['AdmitYear'].isin(filters['years']) &
-    df_general['Gender'].fillna('').astype(str).str.strip().isin(filters['genders']) &
-    df_general['Ethnicity'].fillna('').astype(str).str.strip().isin(filters['ethnicities']) &
-    df_general['Age'].between(filters['age_range'][0], filters['age_range'][1]) &
-    df_general['Region'].isin(filters['regions']) &
-    df_general['UnitType'].isin(filters['units'])
+    df_admitted['AdmitYear'].isin(filters['years']) &
+    df_admitted['Gender'].fillna('').astype(str).str.strip().isin(filters['genders']) &
+    df_admitted['Ethnicity'].fillna('').astype(str).str.strip().isin(filters['ethnicities']) &
+    df_admitted['Age'].between(filters['age_range'][0], filters['age_range'][1]) &
+    df_admitted['Region'].isin(filters['regions']) &
+    df_admitted['UnitType'].isin(filters['units'])
 )
 
-df_filtered = df_general[mask]
+df_filtered = df_admitted[mask]
 
 # Filtrado en cascada para tablas secundarias
 valid_stays = df_filtered['PatientUnitStayID'].dropna().unique()
 df_vitals_filtered = df_vitals[df_vitals['PatientUnitStayID'].isin(valid_stays)]
 df_bp_filtered = df_bp[df_bp['PatientUnitStayID'].isin(valid_stays)]
+df_treatments_filtered = df_treatments[df_treatments['PatientUnitStayID'].isin(valid_stays)]
+df_diagnoses_filtered = df_diagnoses[df_diagnoses['PatientUnitStayID'].isin(valid_stays)]
 
 # 4. Estructura de Pestañas
 st.title("📊 Plataforma de Analítica Clínica y Minería de Datos")
@@ -89,6 +92,8 @@ with tab_dw:
         render_top_diagnoses(df_filtered)
     with col4:
         render_admissions_vs_mortality(df_filtered)
+
+    render_stay_vs_treatment_service(df_filtered)
 
     st.divider()    
 
