@@ -9,21 +9,8 @@ def render_vitals_distribution(df_vitals):
     # Cambiado use_container_width=True por width="stretch"
     st.plotly_chart(fig, width="stretch")
 
-def render_bp_scatter(df_bp):
-    st.subheader("Presión Arterial Sistólica vs Diastólica")
-    fig = px.scatter(
-        df_bp, 
-        x='Diastolic', 
-        y='Systolic', 
-        color='MeanBP_Continuous',
-        opacity=0.6,
-        labels={'Diastolic': 'Presión Diastólica', 'Systolic': 'Presión Sistólica'}
-    )
-    # Cambiado use_container_width=True por width="stretch"
-    st.plotly_chart(fig, width="stretch")
-
 def render_vitals_boxplots(df_vitals):
-    st.subheader("Distribución de Signos Vitales Principales")
+    st.subheader("🩺 Distribución de Signos Vitales Principales")
     
     # Comprobar que las columnas existen en el DataFrame
     required_cols = ['SpO2', 'HeartRate', 'RespiratoryRate']

@@ -3,8 +3,8 @@ from database import load_dw_data
 from components.sidebar import render_sidebar
 from components.kpis import render_kpis
 from components.charts_general import render_treemap, render_demographics, render_comorbidities
-from components.charts_vitals import render_vitals_distribution, render_bp_scatter, render_vitals_boxplots
-
+from components.charts_vitals import render_vitals_distribution, render_vitals_boxplots
+from components.charts_blood_pressure import render_bp_scatter
 st.set_page_config(page_title="Dashboard Clínico - TFG", layout="wide")
 
 # 1. Cargar Datos
@@ -84,16 +84,15 @@ with tab_dw:
     with col22:
         render_comorbidities(df_filtered)
 
-    st.divider()
-    st.subheader("📈 Monitorización de Signos Vitales y Tensión Arterial")
-
-    col31, col32 = st.columns(2)
-    with col31:
-        render_vitals_distribution(df_vitals_filtered)
-    with col32:
-        render_bp_scatter(df_bp_filtered)
+    st.divider()    
 
     render_vitals_boxplots(df_vitals_filtered)
+
+    st.divider()  
+
+    render_bp_scatter(df_bp_filtered)
+
+    
 
 # ==========================================
 # PESTAÑA 3: DATA MINING
