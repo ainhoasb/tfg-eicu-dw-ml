@@ -93,7 +93,7 @@ with tab_dw:
     with col4:
         render_admissions_vs_mortality(df_filtered)
 
-    render_stay_vs_treatment_service(df_filtered)
+    render_stay_vs_treatment_service(df_filtered, df_treatments_filtered)
 
     st.divider()    
 
@@ -102,8 +102,6 @@ with tab_dw:
     st.divider()  
 
     render_bp_scatter(df_bp_filtered)
-
-    
 
 # ==========================================
 # PESTAÑA 3: DATA MINING
