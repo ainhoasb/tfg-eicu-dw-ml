@@ -67,14 +67,63 @@ def render_demographics(df):
     st.plotly_chart(fig, width="stretch")
 
 def render_comorbidities(df):
-    st.subheader("Prevalencia de Comorbilidades")
-    comorbidities = ['Diabetes', 'Cirrhosis', 'HepaticFailure', 'MetastaticCancer', 'Leukemia', 'Lymphoma', 'Immunosuppression', 'MI']
-    counts = df[comorbidities].sum().reset_index()
-    counts.columns = ['Comorbilidad', 'Casos']
+    st.subheader("Prevalencia de Comorbilidades por Grupo Étnico")
+
+    comorbilidades = [
+        'Diabetes', 'Cirrhosis', 'HepaticFailure', 'MetastaticCancer', 
+        'Leukemia', 'Lymphoma', 'Immunosuppression', 'MI'
+    ]
     
-    fig = px.bar(counts, x='Casos', y='Comorbilidad', orientation='h', color='Casos', color_continuous_scale='Reds')
-    # Cambiado use_container_width=True por width="stretch"
-    st.plotly_chart(fig, width="stretch")
+    cols_presentes = [col for col in comorbilidades if col in df.columns]
+    if not cols_presentes or 'Ethnicity' not in df.columns:
+        st.info("Datos insuficientes para generar el análisis de comorbilidades.")
+        return
+
+    df_melted = df.melt(
+        id_vars=['PatientUnitStayID', 'Ethnicity'], 
+        value_vars=cols_presentes, 
+        var_name='Comorbilidad', 
+        value_name='Presente'
+    )
+
+    df_melted['Presente'] = pd.to_numeric(df_melted['Presente'], errors='coerce').fillna(0)
+    df_plot = df_melted[df_melted['Presente'] > 0].copy()
+
+    df_plot['Ethnicity'] = df_plot['Ethnicity'].replace({'': 'Desconocido', None: 'Desconocido'}).fillna('Desconocido')
+    df_plot['Ethnicity'] = df_plot['Ethnicity'].astype(str).str.strip()
+
+    df_grouped = df_plot.groupby(['Ethnicity', 'Comorbilidad']).size().reset_index(name='Casos')
+
+    # MEJORA: Ordenar las etnias de mayor a menor volumen total para un gráfico más armónico
+    orden_etnias = df_grouped.groupby('Ethnicity')['Casos'].sum().sort_values(ascending=False).index
+    df_grouped['Ethnicity'] = pd.Categorical(df_grouped['Ethnicity'], categories=orden_etnias, ordered=True)
+    df_grouped = df_grouped.sort_values(['Ethnicity', 'Comorbilidad'])
+
+    # Crear el gráfico de columnas apiladas (vertical)
+    fig = px.bar(
+        df_grouped,
+        x="Ethnicity",        # Etnias en el eje inferior
+        y="Casos",            # Volumen hacia arriba
+        color="Comorbilidad", # Cada color es una enfermedad
+        orientation='v',      # Gráfico vertical
+        barmode='stack',
+        color_discrete_sequence=px.colors.qualitative.Set2, # Paleta para diferenciar bien 8 colores
+        title="Perfil de comorbilidades según grupo demográfico"
+    )
+
+    fig.update_layout(
+        xaxis_title="Grupo Étnico",
+        yaxis_title="Número Total de Casos",
+        legend_title_text="Comorbilidad",
+        margin=dict(t=40, l=10, r=10, b=10),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        hovermode="x unified" # Al pasar el ratón por una columna, ves todas sus comorbilidades de golpe
+    )
+    
+    fig.update_yaxes(showgrid=True, gridcolor='#f3f4f6')
+
+    st.plotly_chart(fig, use_container_width=True)
 
 def render_top_diagnoses(df):
     st.subheader("Top 10 Diagnósticos de Ingreso")
@@ -128,7 +177,7 @@ def render_top_diagnoses(df):
     st.plotly_chart(fig, use_container_width=True)
 
 def render_admissions_vs_mortality(df):
-    st.subheader("📈 Ingresos y Mortalidad por Servicio Médico")
+    st.subheader("Ingresos y Mortalidad por Servicio Médico")
 
     # Aseguramos que tenemos la columna Service (la preparamos en tu vista SQL anterior)
     required_cols = ['Service', 'DiedInHospital']

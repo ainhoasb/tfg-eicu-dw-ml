@@ -78,14 +78,17 @@ with tab_dw:
 
     render_treemap(df_filtered)
 
-    col21, col22 = st.columns(2)
-    with col21:
+    col1, col2 = st.columns(2)
+    with col1:
         render_demographics(df_filtered)
-    with col22:
+    with col2:
         render_comorbidities(df_filtered)
 
-    render_top_diagnoses(df_filtered)
-    render_admissions_vs_mortality(df_filtered)
+    col3, col4 = st.columns(2)
+    with col3:
+        render_top_diagnoses(df_filtered)
+    with col4:
+        render_admissions_vs_mortality(df_filtered)
 
     st.divider()    
 
