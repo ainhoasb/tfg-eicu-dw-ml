@@ -1,0 +1,20 @@
+{
+    "Age": [0, 110],
+    "AdmissionHeight": [90, 280],
+    "AdmissionWeight": [30, 350],
+    "APS": [0, 252],
+    "ApacheScore": [0, 286],
+    "HeartRate_Admission": [0, 300],
+    "MeanBP_Admission": [10, 250],
+    "Temperature": [30.0, 45.0],
+    "RespiratoryRate_Admission": [4, 60],
+    "Eyes": [1, 4],
+    "Verbal": [1, 5],
+    "Motor": [1, 6],
+    "Glucose": [10, 2000],
+    "Sodium": [90, 190],
+    "Creatinine": [0.1, 40],
+    "BUN": [1, 300],
+    "Hematocrit": [5, 75],
+    "WBC": [0, 350]    
+}
