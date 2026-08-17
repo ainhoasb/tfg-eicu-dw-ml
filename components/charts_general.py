@@ -177,7 +177,7 @@ def render_top_diagnoses(df):
     st.plotly_chart(fig, use_container_width=True)
 
 def render_admissions_vs_mortality(df):
-    st.subheader("Ingresos y Mortalidad por Servicio Médico")
+    st.subheader("Ingresos y Mortalidad por Servicio de Admisión")
 
     # Aseguramos que tenemos la columna Service (la preparamos en tu vista SQL anterior)
     required_cols = ['Service', 'DiedInHospital']
