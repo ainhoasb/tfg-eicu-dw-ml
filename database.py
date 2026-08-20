@@ -7,7 +7,7 @@ import streamlit as st
 warnings.filterwarnings('ignore', category=UserWarning)
 
 def get_connection():
-    with open('config.yaml', 'r') as file:
+    with open('data/config.yaml', 'r') as file:
         db_config = yaml.safe_load(file)['local_sql']
     
     connection_string = (
