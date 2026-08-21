@@ -91,11 +91,15 @@ def render_sidebar(df_general):
         unit_types = sorted(df_general['UnitType'].dropna().unique())
         selected_units = st.multiselect("Tipo de Unidad", unit_types, default=unit_types)
 
+        services = sorted(df_general['Service'].dropna().unique())
+        selected_services = st.multiselect("Área Clínica (Service)", services, default=services)
+
     return {
         "years": selected_years,
         "genders": selected_genders,
         "age_range": selected_age_range,
         "ethnicities": selected_ethnicities,
         "regions": selected_regions,
-        "units": selected_units
+        "units": selected_units,
+        "services": selected_services
     }
