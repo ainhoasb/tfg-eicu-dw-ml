@@ -68,19 +68,25 @@ def render_poblacion_selector() -> str:
             color: {"white" if seleccionada == "A" else color_a} !important;
             background-color: {color_a if seleccionada == "A" else "white"} !important;
             font-weight: 600;
+            font-size: 1.15rem;
+            padding: 0.9rem 1.2rem;
+            height: 3.2rem;
         }}
         div.st-key-btn_poblacion_b button {{
             border: 2px solid {color_b} !important;
             color: {"white" if seleccionada == "B" else color_b} !important;
             background-color: {color_b if seleccionada == "B" else "white"} !important;
             font-weight: 600;
+            font-size: 1.15rem;
+            padding: 0.9rem 1.2rem;
+            height: 3.2rem;
         }}
         </style>
         """,
         unsafe_allow_html=True,
     )
  
-    _, col_a, col_b, _ = st.columns([2, 1.6, 1.6, 2])
+    _, col_a, col_b, _ = st.columns([1.2, 2, 2, 1.2])
     with col_a:
         with st.container(key="btn_poblacion_a"):
             if st.button("Población A · Todos los pacientes", use_container_width=True, key="click_poblacion_a"):
