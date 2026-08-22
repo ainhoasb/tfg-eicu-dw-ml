@@ -332,7 +332,7 @@ def render_mortality_table(df: pd.DataFrame, columna_cluster: str):
     tabla_html = "\n".join(line.strip() for line in tabla_html.strip().splitlines())
     st.markdown(tabla_html, unsafe_allow_html=True) 
  
-def render_comorbidity_and_vitals_heatmaps(df: pd.DataFrame, columna_cluster: str):
+def render_comorbidity_heatmap(df: pd.DataFrame, columna_cluster: str):
     st.subheader("Caracterización Clínica de los Clústeres")
     if df.empty:
         return
@@ -346,12 +346,6 @@ def render_comorbidity_and_vitals_heatmaps(df: pd.DataFrame, columna_cluster: st
     tabla_comorb = (df.groupby(columna_cluster)[COMORBILIDADES].mean() * 100)
     tabla_comorb.columns = [NOMBRES_COMORBILIDAD[c] for c in COMORBILIDADES]
  
-    tabla_vitales = df.groupby(columna_cluster)[VITALES].median()
-    medias_globales = df[VITALES].mean()
-    stds_globales = df[VITALES].std().replace(0, 1)
-    tabla_vitales_z = (tabla_vitales - medias_globales) / stds_globales
-    tabla_vitales_z.columns = [NOMBRES_VITAL[c] for c in VITALES]
- 
     if ordenar_por_carga:
         orden = tabla_comorb.sum(axis=1).sort_values(ascending=False).index
         tabla_comorb = tabla_comorb.loc[orden]
@@ -359,31 +353,16 @@ def render_comorbidity_and_vitals_heatmaps(df: pd.DataFrame, columna_cluster: st
  
     tabla_comorb_t = tabla_comorb.T
     tabla_comorb_t.columns = [f"Clúster {c}" for c in tabla_comorb_t.columns]
-    tabla_vitales_t = tabla_vitales_z.T
-    tabla_vitales_t.columns = [f"Clúster {c}" for c in tabla_vitales_t.columns]
  
-    col1, col2 = st.columns(2)
-    with col1:
-        fig1 = px.imshow(
-            tabla_comorb_t,
-            color_continuous_scale="Reds",
-            text_auto=".1f",
-            aspect="auto",
-            labels=dict(color="% ingresos"),
-        )
-        fig1.update_layout(title="Comorbilidades por Clúster (%)")
-        st.plotly_chart(fig1, use_container_width=True)
-    with col2:
-        fig2 = px.imshow(
-            tabla_vitales_t,
-            color_continuous_scale="RdBu_r",
-            color_continuous_midpoint=0,
-            text_auto=".2f",
-            aspect="auto",
-            labels=dict(color="Desviación (z)"),
-        )
-        fig2.update_layout(title="Vitales y Edad por Clúster (desviación sobre la media global)")
-        st.plotly_chart(fig2, use_container_width=True)
+    fig1 = px.imshow(
+        tabla_comorb_t,
+        color_continuous_scale="Reds",
+        text_auto=".1f",
+        aspect="auto",
+        labels=dict(color="% ingresos"),
+    )
+    fig1.update_layout(title="Comorbilidades por Clúster (%)")
+    st.plotly_chart(fig1, use_container_width=True)
  
  
 def render_radar_chart(df: pd.DataFrame, columna_cluster: str, color_map: dict):
