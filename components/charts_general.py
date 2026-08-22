@@ -32,21 +32,21 @@ def render_treemap(df):
         df_tree[col] = df_tree[col].replace({'': 'No especificado', 'nan': 'No especificado'})
 
     # Agrupación de datos
-    df_grouped = df_tree.groupby(path_cols).size().reset_index(name='TotalPacientes')
-    df_grouped = df_grouped[df_grouped['TotalPacientes'] > 0]
+    df_grouped = df_tree.groupby(path_cols).size().reset_index(name='Total Ingresos')
+    df_grouped = df_grouped[df_grouped['Total Ingresos'] > 0]
 
     fig = px.treemap(
         df_grouped,
         path=path_cols,
-        values='TotalPacientes',
-        color='TotalPacientes',
+        values='Total Ingresos',
+        color='Total Ingresos',
         color_continuous_scale='Blues',
         title="Navegación visual por región, centro sanitario y servicio médico"
     )
 
     fig.update_traces(
         texttemplate="%{label}<br>Nº Ingresos: %{value}",
-        hovertemplate="<b>%{label}</b><br>Pacientes: %{value:,}<br>Proporción: %{percentParent:.1%}"
+        hovertemplate="<b>%{label}</b><br>Ingresos: %{value:,}<br>Proporción: %{percentParent:.1%}"
     )
 
     fig.update_layout(margin=dict(t=30, l=10, r=10, b=10))
@@ -61,8 +61,9 @@ def render_demographics(df):
         color='Gender', 
         barmode='group',
         nbins=20,
-        labels={'Age': 'Edad', 'count': 'Número de Pacientes'}
+        labels={'Age': 'Edad'}
     )
+    fig.update_layout(yaxis_title="Número de Ingresos")
     # Cambiado use_container_width=True por width="stretch"
     st.plotly_chart(fig, width="stretch")
 
@@ -92,10 +93,10 @@ def render_comorbidities(df):
     df_plot['Ethnicity'] = df_plot['Ethnicity'].replace({'': 'Desconocido', None: 'Desconocido'}).fillna('Desconocido')
     df_plot['Ethnicity'] = df_plot['Ethnicity'].astype(str).str.strip()
 
-    df_grouped = df_plot.groupby(['Ethnicity', 'Comorbilidad']).size().reset_index(name='Casos')
+    df_grouped = df_plot.groupby(['Ethnicity', 'Comorbilidad']).size().reset_index(name='Ingresos')
 
     # MEJORA: Ordenar las etnias de mayor a menor volumen total para un gráfico más armónico
-    orden_etnias = df_grouped.groupby('Ethnicity')['Casos'].sum().sort_values(ascending=False).index
+    orden_etnias = df_grouped.groupby('Ethnicity')['Ingresos'].sum().sort_values(ascending=False).index
     df_grouped['Ethnicity'] = pd.Categorical(df_grouped['Ethnicity'], categories=orden_etnias, ordered=True)
     df_grouped = df_grouped.sort_values(['Ethnicity', 'Comorbilidad'])
 
@@ -103,7 +104,7 @@ def render_comorbidities(df):
     fig = px.bar(
         df_grouped,
         x="Ethnicity",        # Etnias en el eje inferior
-        y="Casos",            # Volumen hacia arriba
+        y="Ingresos",            # Volumen hacia arriba
         color="Comorbilidad", # Cada color es una enfermedad
         orientation='v',      # Gráfico vertical
         barmode='stack',
@@ -113,7 +114,7 @@ def render_comorbidities(df):
 
     fig.update_layout(
         xaxis_title="Grupo Étnico",
-        yaxis_title="Número Total de Casos",
+        yaxis_title="Número Total de Ingresos",
         legend_title_text="Comorbilidad",
         margin=dict(t=40, l=10, r=10, b=10),
         plot_bgcolor="rgba(0,0,0,0)",
@@ -138,7 +139,7 @@ def render_top_diagnoses(df):
     
     # Extraemos solo los 10 más frecuentes
     top_10 = df_clean['DiagnosisAdmission'].value_counts().nlargest(10).reset_index()
-    top_10.columns = ['Diagnóstico', 'Total Pacientes']
+    top_10.columns = ['Diagnóstico', 'Total Ingresos']
 
     if top_10.empty:
         st.info("No hay diagnósticos registrados con los filtros actuales.")
@@ -148,7 +149,7 @@ def render_top_diagnoses(df):
     fig = px.pie(
         top_10,
         names='Diagnóstico',
-        values='Total Pacientes',
+        values='Total Ingresos',
         hole=0.45,
         title="Causas principales de admisión en UCI",
         color_discrete_sequence=px.colors.sequential.Teal  # Tonos clínicos
@@ -209,7 +210,7 @@ def render_admissions_vs_mortality(df):
     # MEJORA ANALÍTICA: Ordenar de mayor a menor volumen de ingresos
     df_grouped = df_grouped.sort_values(by='Total_Ingresos', ascending=False)
     
-    # Filtramos servicios con muy poco volumen (menos de 5 casos) para limpiar la gráfica
+    # Filtramos servicios con muy poco volumen (menos de 5 ingresos) para limpiar la gráfica
     df_grouped = df_grouped[df_grouped['Total_Ingresos'] >= 5]
 
     # 4. Creación del gráfico con dos capas
@@ -243,7 +244,7 @@ def render_admissions_vs_mortality(df):
     fig.update_layout(
         title="Curva de volumen y mortalidad clínica",
         xaxis_title="Especialidad / Servicio",
-        yaxis_title="Número de Pacientes",
+        yaxis_title="Número de Ingresos",
         hovermode="x unified", # MEJORA VISUAL: Combina las métricas en una sola caja al pasar el ratón
         legend=dict(
             orientation="h", 

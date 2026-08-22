@@ -47,14 +47,14 @@ def render_bp_scatter(df_bp):
         y="Systolic",
         color="Estado Clínico",
         color_discrete_map=color_map,
-        hover_data=["PatientUnitStayID"], # <--- Añade el ID del paciente al tooltip
+        hover_data=["PatientUnitStayID"], # <--- Añade el ID del ingreso al tooltip
         opacity=0.75,
         title="Clasificación del Riesgo Cardiovascular"
     )
 
     # Personalizar la etiqueta flotante (tooltip) para que sea más limpia
     fig.update_traces(
-        hovertemplate="<b>Paciente ID: %{customdata[0]}</b><br>" +
+        hovertemplate="<b>Ingreso ID: %{customdata[0]}</b><br>" +
                       "Sistólica: %{y} mmHg<br>" +
                       "Diastólica: %{x} mmHg<br>"
     )

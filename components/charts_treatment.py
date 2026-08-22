@@ -44,7 +44,7 @@ def render_stay_vs_treatment_service(df_general, df_treatments):
     )
 
     # 5. Diseño visual
-    # Calculamos el percentil 95 global para recortar el eje X y que un paciente de 100 días no aplaste todo el gráfico
+    # Calculamos el percentil 95 global para recortar el eje X y que un ingreso de 100 días no aplaste todo el gráfico
     limite_x = df_plot['DischargeDayNumber'].quantile(0.95)
 
     fig.update_layout(

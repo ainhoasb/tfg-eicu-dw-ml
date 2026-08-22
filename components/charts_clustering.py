@@ -2,7 +2,7 @@
 Componentes: Clustering de Fenotipos Clínicos en UCI (Notebook 04)
 ====================================================================
 
-Columnas que debe tener `df` (a nivel de paciente, exportado desde el
+Columnas que debe tener `df` (a nivel de ingreso, exportado desde el
 notebook 04, Modelo Final sin `DiagnosisAdmission`):
 
     - Age, Gender, Ethnicity, UnitType, Service : para poder filtrar (sidebar)
@@ -152,7 +152,7 @@ def build_color_map(df: pd.DataFrame, columna_cluster: str) -> dict:
  
 def render_kpis(df: pd.DataFrame, columna_cluster: str):
     if df.empty:
-        st.warning("No hay pacientes que cumplan los filtros seleccionados.")
+        st.warning("No hay ingresos que cumplan los filtros seleccionados.")
         return
  
     color = COLOR_ALGORITMO[columna_cluster]["color"]
@@ -168,7 +168,7 @@ def render_kpis(df: pd.DataFrame, columna_cluster: str):
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         _kpi_card(
-            "Pacientes",
+            "Ingresos",
             f"{len(df):,}",
             f"{etiqueta_algoritmo} · {resumen.shape[0]} clústeres",
             color,
@@ -180,7 +180,7 @@ def render_kpis(df: pd.DataFrame, columna_cluster: str):
         _kpi_card(
             "Clúster Más Numeroso",
             f"Clúster {cluster_mas_numeroso}",
-            f"{int(resumen.loc[cluster_mas_numeroso, 'size']):,} pacientes",
+            f"{int(resumen.loc[cluster_mas_numeroso, 'size']):,} ingresos",
             color,
             bg,
         )
@@ -209,13 +209,13 @@ def render_volume_donut(df: pd.DataFrame, columna_cluster: str, color_map: dict)
                 values=conteo.values,
                 hole=0.45,
                 marker=dict(colors=colores, line=dict(color="white", width=2)),
-                hovertemplate="<b>%{label}</b><br>%{value:,} pacientes<br>%{percent}<extra></extra>",
+                hovertemplate="<b>%{label}</b><br>%{value:,} ingresos<br>%{percent}<extra></extra>",
                 textinfo="percent",
             )
         ]
     )
     fig.update_layout(
-        title="Distribución de Pacientes por Fenotipo",
+        title="Volumen de Ingresos por Fenotipo Clínico del Paciente",
         legend=dict(orientation="v", yanchor="middle", y=0.5),
     )
     st.plotly_chart(fig, use_container_width=True)
@@ -223,13 +223,13 @@ def render_volume_donut(df: pd.DataFrame, columna_cluster: str, color_map: dict)
  
 def render_mortality_by_cluster(df: pd.DataFrame, columna_cluster: str, color_map: dict):
     if df.empty:
-        st.warning("No hay pacientes que cumplan los filtros seleccionados.")
+        st.warning("No hay ingresos que cumplan los filtros seleccionados.")
         return
  
     tasa_global = df["DiedInHospital"].mean() * 100
     tabla = (
         df.groupby(columna_cluster)
-        .agg(n_pacientes=("DiedInHospital", "size"), tasa_mortalidad=("DiedInHospital", "mean"))
+        .agg(n_ingresos=("DiedInHospital", "size"), tasa_mortalidad=("DiedInHospital", "mean"))
         .reset_index()
     )
     tabla["tasa_mortalidad"] = tabla["tasa_mortalidad"] * 100
@@ -244,8 +244,8 @@ def render_mortality_by_cluster(df: pd.DataFrame, columna_cluster: str, color_ma
                 color=[color_map[c] for c in tabla[columna_cluster]],
                 line=dict(color="black", width=0.5),
             ),
-            customdata=tabla["n_pacientes"],
-            hovertemplate="Clúster %{x}<br>Mortalidad: %{y:.2f}%<br>Pacientes: %{customdata:,}<extra></extra>",
+            customdata=tabla["n_ingresos"],
+            hovertemplate="Clúster %{x}<br>Mortalidad: %{y:.2f}%<br>Ingresos: %{customdata:,}<extra></extra>",
         )
     )
     fig.add_hline(
@@ -274,7 +274,7 @@ def render_mortality_table(df: pd.DataFrame, columna_cluster: str):
     tasa_global = df["DiedInHospital"].mean() * 100
     tabla = (
         df.groupby(columna_cluster)
-        .agg(Pacientes=("DiedInHospital", "size"), Mortalidad=("DiedInHospital", "mean"))
+        .agg(Ingresos=("DiedInHospital", "size"), Mortalidad=("DiedInHospital", "mean"))
         .reset_index()
     )
     tabla["Mortalidad"] = tabla["Mortalidad"] * 100
@@ -293,7 +293,7 @@ def render_mortality_table(df: pd.DataFrame, columna_cluster: str):
         filas_html += f"""
         <tr>
             <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb;">Clúster {int(fila['Clúster'])}</td>
-            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">{int(fila['Pacientes']):,}</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">{int(fila['Ingresos']):,}</td>
             <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <div style="background: #f3f4f6; border-radius: 4px; flex-grow: 1; height: 14px; overflow: hidden;">
@@ -318,7 +318,7 @@ def render_mortality_table(df: pd.DataFrame, columna_cluster: str):
             <thead>
                 <tr style="background-color: {color};">
                     <th style="padding: 10px 12px; text-align: left; color: white; font-weight: 700;">Clúster</th>
-                    <th style="padding: 10px 12px; text-align: right; color: white; font-weight: 700;">Pacientes</th>
+                    <th style="padding: 10px 12px; text-align: right; color: white; font-weight: 700;">Ingresos</th>
                     <th style="padding: 10px 12px; text-align: left; color: white; font-weight: 700;">Mortalidad</th>
                     <th style="padding: 10px 12px; text-align: right; color: white; font-weight: 700;">Respecto a la Media Global</th>
                 </tr>
@@ -369,7 +369,7 @@ def render_comorbidity_and_vitals_heatmaps(df: pd.DataFrame, columna_cluster: st
             color_continuous_scale="Reds",
             text_auto=".1f",
             aspect="auto",
-            labels=dict(color="% pacientes"),
+            labels=dict(color="% ingresos"),
         )
         fig1.update_layout(title="Comorbilidades por Clúster (%)")
         st.plotly_chart(fig1, use_container_width=True)

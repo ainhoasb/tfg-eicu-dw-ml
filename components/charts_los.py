@@ -2,7 +2,7 @@
 Componentes: Regresión de Estancia en UCI - LoS (Notebook 03)
 ====================================================================
  
-Columnas que debe tener `df` (a nivel de paciente, exportado desde el
+Columnas que debe tener `df` (a nivel de ingreso, exportado desde el
 notebook 03, Poblaciones A y B combinadas en un único parquet):
  
     - Age            : edad
@@ -10,14 +10,14 @@ notebook 03, Poblaciones A y B combinadas en un único parquet):
     - Ethnicity        : etnicidad
     - UnitType         : tipo de unidad UCI
     - Service         : área clínica
-    - Poblacion        : 'A' (todos los pacientes) o 'B' (solo supervivientes)
+    - Poblacion        : 'A' (todos los ingresos) o 'B' (Ingresos sin fallecimiento)
     - y_true_dias      : DischargeDayNumber real (escala original, días)
     - y_pred_dias      : estancia predicha por el modelo ganador de esa
                           población (escala original)
  
 Columnas que debe tener `df_importancia` (a nivel de variable, exportado
 desde las Secciones 4.6 / 5.5 del notebook 03 -- una fila por variable y
-población, NO a nivel de paciente, así que no se filtra con la sidebar):
+población, NO a nivel de ingresos, así que no se filtra con la sidebar):
  
     - Poblacion       : 'A' o 'B'
     - Variable          : nombre de la variable predictora
@@ -40,8 +40,8 @@ from scipy.stats import gaussian_kde
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 COLOR_POBLACION = {
-    "A": {"etiqueta": "Población A · Todos los pacientes", "color": "#3b82f6", "bg": "#eff6ff"},
-    "B": {"etiqueta": "Población B · Solo supervivientes", "color": "#10b981", "bg": "#ecfdf5"},
+    "A": {"etiqueta": "Población A · Todos los ingresos", "color": "#3b82f6", "bg": "#eff6ff"},
+    "B": {"etiqueta": "Población B · Ingresos sin fallecimiento", "color": "#10b981", "bg": "#ecfdf5"},
 }
 
 COLOR_REAL = "#6b7280"  # gris neutro, igual para ambas poblaciones
@@ -89,12 +89,12 @@ def render_poblacion_selector() -> str:
     _, col_a, col_b, _ = st.columns([1.2, 2, 2, 1.2])
     with col_a:
         with st.container(key="btn_poblacion_a"):
-            if st.button("Población A · Todos los pacientes", use_container_width=True, key="click_poblacion_a"):
+            if st.button("Población A · Todos los ingresos", use_container_width=True, key="click_poblacion_a"):
                 st.session_state["estancia_poblacion"] = "A"
                 st.rerun()
     with col_b:
         with st.container(key="btn_poblacion_b"):
-            if st.button("Población B · Solo supervivientes", use_container_width=True, key="click_poblacion_b"):
+            if st.button("Población B · Ingresos sin fallecimiento", use_container_width=True, key="click_poblacion_b"):
                 st.session_state["estancia_poblacion"] = "B"
                 st.rerun()
  
@@ -126,7 +126,7 @@ def _kpi_card(etiqueta: str, valor: str, subtitulo: str, color: str, bg: str):
 def render_kpis(df: pd.DataFrame, codigo_poblacion: str):
     df_poblacion = df[df["Poblacion"] == codigo_poblacion]
     if df_poblacion.empty:
-        st.warning("No hay pacientes de esta población que cumplan los filtros seleccionados.")
+        st.warning("No hay ingresos de esta población que cumplan los filtros seleccionados.")
         return
  
     mae = mean_absolute_error(df_poblacion["y_true_dias"], df_poblacion["y_pred_dias"])
@@ -139,7 +139,7 @@ def render_kpis(df: pd.DataFrame, codigo_poblacion: str):
     col1, col2, col3 = st.columns(3)
     with col1:
         _kpi_card(
-            "Pacientes",
+            "Ingresos",
             f"{len(df_poblacion):,}",
             f"{etiqueta_poblacion} · solo conjunto de test (20% del total)",
             color,
@@ -152,7 +152,7 @@ def render_kpis(df: pd.DataFrame, codigo_poblacion: str):
  
  
 def render_distribution_comparison(df: pd.DataFrame, codigo_poblacion: str):
-    """Histogramas superpuestos comparando estancia real vs. predicha, en conteo absoluto de pacientes.
+    """Histogramas superpuestos comparando estancia real vs. predicha, en conteo absoluto de ingresos.
  
     La estancia real ya es un valor entero. Para que la comparación sea justa, la predicha (continua, salida 
     directa del modelo) se redondea con la misma lógica de truncamiento antes de graficar.
@@ -215,7 +215,7 @@ def render_distribution_comparison(df: pd.DataFrame, codigo_poblacion: str):
     fig.update_layout(
         title="Distribución de la Estancia Real frente la Predicha (escala logarítmica)",
         xaxis_title="Estancia (días)",
-        yaxis_title="Número de pacientes",
+        yaxis_title="Número de ingresos",
         barmode="overlay",
         bargap=0.02,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
@@ -261,7 +261,7 @@ def render_residuals_histogram(df: pd.DataFrame, codigo_poblacion: str):
     fig.update_layout(
         title="Distribución de los Residuos",
         xaxis_title="Residuo (real - predicho, días)",
-        yaxis_title="Número de pacientes",
+        yaxis_title="Número de ingresos",
         bargap=0.02,
     )
     st.plotly_chart(fig, use_container_width=True)
@@ -299,5 +299,5 @@ def render_feature_importance(df_importancia: pd.DataFrame, codigo_poblacion: st
     st.caption(
         "Nota: los filtros de la sidebar no afectan a esta gráfica. La importancia de "
         "variables es una propiedad global del modelo ya entrenado (calculada una vez "
-        "sobre todo el conjunto de entrenamiento), no una métrica por paciente"
+        "sobre todo el conjunto de entrenamiento), no una métrica por ingreso"
     )

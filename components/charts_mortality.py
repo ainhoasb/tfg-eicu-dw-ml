@@ -2,7 +2,7 @@
 Componentes: Clasificación de Mortalidad en UCI (Notebook 02)
 ====================================================================
  
-Columnas que debe tener `df` (a nivel de paciente, exportado desde el
+Columnas que debe tener `df` (a nivel de ingreso, exportado desde el
 notebook 02):
  
     - Age                : edad
@@ -17,11 +17,11 @@ notebook 02):
     - y_pred_umbral_optimo : predicción binaria con el umbral ajustado (F1)
  
 Columnas que debe tener `df_shap` (opcional; Sección 5 del notebook 02 --
-SOLO una submuestra de 200 pacientes de test, no todo el conjunto):
+SOLO una submuestra de 200 ingresos de test, no todo el conjunto):
  
     - Age, Gender, Ethnicity, UnitType   : para poder filtrar igual que en `df`
     - shap_<variable>  : una columna por variable del modelo, con el valor
-                          SHAP de esa variable para ese paciente
+                          SHAP de esa variable para ese ingreso
  
 No se recalcula ninguna predicción ni ningún valor SHAP aquí: todo se
 calculó una vez en el notebook y se exportó a parquet.
@@ -64,20 +64,20 @@ def _kpi_card(etiqueta: str, valor: str, subtitulo: str, color: str, bg: str):
 
 def render_kpis(df: pd.DataFrame, columna_pred: str):
     if df.empty:
-        st.warning("No hay pacientes que cumplan los filtros seleccionados.")
+        st.warning("No hay ingresos que cumplan los filtros seleccionados.")
         return
  
     color = COLOR_UMBRAL[columna_pred]["color"]
     bg = COLOR_UMBRAL[columna_pred]["bg"]
     etiqueta_umbral = COLOR_UMBRAL[columna_pred]["etiqueta"]
  
-    n_pacientes = len(df)
+    n_ingresos = len(df)
     n_fallecidos = int(df["y_true"].sum())
-    tasa_mortalidad = n_fallecidos / n_pacientes * 100
+    tasa_mortalidad = n_fallecidos / n_ingresos * 100
  
     col1, col2, col3 = st.columns(3)
     with col1:
-        _kpi_card("Pacientes", f"{n_pacientes:,}", f"Umbral: {etiqueta_umbral}", color, bg)
+        _kpi_card("Ingresos", f"{n_ingresos:,}", f"Umbral: {etiqueta_umbral}", color, bg)
     with col2:
         _kpi_card("Fallecimientos", f"{n_fallecidos:,}", "Casos positivos reales (y_true)", color, bg)
     with col3:
@@ -152,14 +152,14 @@ def render_confusion_matrix(df: pd.DataFrame, columna_pred: str):
         color_continuous_scale=COLOR_UMBRAL[columna_pred]["escala"],
         x=labels,
         y=labels,
-        labels=dict(x="Predicho", y="Real", color="Nº pacientes"),
+        labels=dict(x="Predicho", y="Real", color="Nº ingresos"),
     )
     fig.update_layout(title=f"Matriz de Confusión ({etiqueta_umbral})", coloraxis_showscale=False)
     st.plotly_chart(fig, use_container_width=True)
  
  
 def render_unit_pressure(df: pd.DataFrame, columna_pred: str):
-    """Combinado de barras (volumen de pacientes) + línea (% en riesgo) por tipo de unidad UCI."""
+    """Combinado de barras (volumen de ingresos) + línea (% en riesgo) por tipo de unidad UCI."""
     if df.empty:
         return
  
@@ -167,18 +167,18 @@ def render_unit_pressure(df: pd.DataFrame, columna_pred: str):
  
     tabla = (
         df.groupby("UnitType")
-        .agg(n_pacientes=("y_true", "size"), tasa_riesgo=(columna_pred, "mean"))
+        .agg(n_ingresos=("y_true", "size"), tasa_riesgo=(columna_pred, "mean"))
         .reset_index()
     )
     tabla["tasa_riesgo"] = tabla["tasa_riesgo"] * 100
-    tabla = tabla.sort_values("n_pacientes", ascending=False)
+    tabla = tabla.sort_values("n_ingresos", ascending=False)
  
     fig = go.Figure()
     fig.add_trace(
         go.Bar(
             x=tabla["UnitType"],
-            y=tabla["n_pacientes"],
-            name="Volumen de pacientes",
+            y=tabla["n_ingresos"],
+            name="Volumen de ingresos",
             marker=dict(color="#cbd5e1", line=dict(color="black", width=0.5)),
             yaxis="y1",
         )
@@ -197,7 +197,7 @@ def render_unit_pressure(df: pd.DataFrame, columna_pred: str):
     fig.update_layout(
         title=f"Presión Asistencial por Unidad ({COLOR_UMBRAL[columna_pred]['etiqueta']})",
         xaxis_title="Tipo de Unidad",
-        yaxis=dict(title="Nº de pacientes", side="left"),
+        yaxis=dict(title="Nº de ingresos", side="left"),
         yaxis2=dict(title="% clasificados en riesgo", side="right", overlaying="y", range=[0, 100]),
         legend=dict(orientation="h", yanchor="bottom", y=1.05, xanchor="right", x=1),
     )
@@ -230,7 +230,7 @@ def render_service_risk_heatmap(df: pd.DataFrame):
  
 def render_severity_agreement(df: pd.DataFrame, columna_pred: str):
     """Compara el riesgo predicho por el modelo con los scores de gravedad clínica establecidos (APS y/o ApacheScore), 
-    agrupando a los pacientes en deciles del score elegido"""
+    agrupando a los ingresos en deciles del score elegido"""
     if df.empty:
         return
  
@@ -256,7 +256,7 @@ def render_severity_agreement(df: pd.DataFrame, columna_pred: str):
         .agg(
             riesgo_predicho=("y_pred_proba", "mean"),
             mortalidad_real=("y_true", "mean"),
-            n_pacientes=("y_true", "size"),
+            n_ingresos=("y_true", "size"),
             score_medio=(score_elegido, "mean"),
         )
         .reset_index()
@@ -308,7 +308,7 @@ def render_severity_agreement(df: pd.DataFrame, columna_pred: str):
         st.plotly_chart(fig, use_container_width=True)
  
     st.caption(
-        "Nota: Cada punto agrupa ~10% de los pacientes con gravedad similar (deciles), no pacientes individuales."
+        "Nota: Cada punto agrupa ~10% de los ingresos con gravedad similar (deciles), no ingresos individuales."
     )
  
  
@@ -384,16 +384,16 @@ def _shap_columnas(df_shap: pd.DataFrame):
 def render_shap_note(df_shap: pd.DataFrame):
     if df_shap is None or df_shap.empty:
         st.info(
-            "No hay pacientes de la submuestra SHAP que cumplan los filtros seleccionados "
+            "No hay ingresos de la submuestra SHAP que cumplan los filtros seleccionados "
         )
         return False
     return True
  
  
 def render_shap_beeswarm(df_shap: pd.DataFrame, top_n: int = 15):
-    """Gráfico tipo beeswarm: un punto por (paciente, variable).
+    """Gráfico tipo beeswarm: un punto por (ingreso, variable).
  
-    El color representa el VALOR de la variable para ese paciente (bajo/alto,
+    El color representa el VALOR de la variable para ese ingreso (bajo/alto,
     igual que el beeswarm clásico de la librería `shap`), no el propio valor SHAP.
     """
     if df_shap is None or df_shap.empty:

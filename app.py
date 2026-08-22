@@ -129,7 +129,7 @@ with tab_mortalidad:
     st.header("🎯 Modelo de Clasificación - Predicción de Mortalidad en UCI")
     st.write(
             """
-            Modelo supervisado que predice el **riesgo de fallecimiento** de un paciente
+            Modelo supervisado que predice el **riesgo de fallecimiento** asociado al ingreso de un paciente
             durante su estancia en la UCI, a partir de variables clínicas registradas en las
             primeras horas del ingreso (edad, scores APACHE/APS, comorbilidades, constantes
             vitales). Se compararon Regresión Logística, Random Forest y XGBoost mediante
@@ -180,7 +180,7 @@ with tab_estancia:
             """
             Modelo supervisado que predice la **duración de la estancia en UCI** (en días)
             a partir de las variables clínicas del ingreso. Se comparan dos poblaciones: **A** (todos los
-            pacientes) y **B** (solo supervivientes, como análisis de sensibilidad).
+            ingresos) y **B** (ingresos sin fallecimiento, como análisis de sensibilidad).
             """
         )
     st.divider()
@@ -192,7 +192,7 @@ with tab_estancia:
     with col1:
             charts_los.render_distribution_comparison(df_estancia_filtered, codigo_poblacion)
     with col2:
-        # df_estancia_importancia es a nivel de variable (no de paciente), por eso no pasa por filter_model_df
+        # df_estancia_importancia es a nivel de variable (no de ingreso), por eso no pasa por filter_model_df
         # los filtros de la sidebar no le aplican.
         charts_los.render_feature_importance(df_estancia_importancia, codigo_poblacion)
  
@@ -210,7 +210,7 @@ with tab_clustering:
     st.header("📊 Modelo de Clustering - Descubrimiento de Fenotipos Clínicos en UCI")
     st.write(
             """
-            Modelo no supervisado (K-Means y GMM) que agrupa a los pacientes en **fenotipos clínicos**, 
+            Modelo no supervisado (K-Means y GMM) que identifica **fenotipos clínicos** del paciente al ingreso, 
             definidos como subgrupos con patrones similares de comorbilidades, constantes vitales y edad. 
             La variable de mortalidad no participó en el proceso de clustering, sino que se utiliza después 
             a modo de validación para comprobar si los clústeres descubiertos tienen relevancia clínica real.
