@@ -12,7 +12,7 @@ from components.charts_treatment import  render_stay_vs_treatment_service
 from components.charts_vitals import render_vitals_distribution, render_vitals_boxplots
 from components.charts_blood_pressure import render_bp_scatter
 
-from components import charts_mortality, charts_los, charts_clustering
+from components import charts_mortality, charts_los, charts_clustering, introduction, help
 
 
 st.set_page_config(page_title="Dashboard Clínico - TFG", layout="wide")
@@ -54,41 +54,19 @@ df_clustering_filtered = filter_model_df(df_clustering, filters)
 st.title("📊 Plataforma de Analítica Clínica y Minería de Datos")
 
 # Definición de las Pestañas Principales
-tab_intro, tab_dw, tab_mortalidad, tab_estancia, tab_clustering = st.tabs([
-    "ℹ️ Introducción & Arquitectura",
+tab_intro, tab_dw, tab_mortalidad, tab_estancia, tab_clustering, tab_ayuda = st.tabs([
+    "ℹ️ Introducción",
     "🏥 Analítica Descriptiva", 
     "🎯 Clasificación de Mortalidad en UCI",
     "🏨 Regresión de Estancia en UCI",
-    "📊 Clustering de Fenotipos Clínicos"])
+    "📊 Clustering de Fenotipos Clínicos",
+    "❓ Guía de Lectura"])
 
 # ==========================================
 # PESTAÑA 1: INTRODUCCIÓN Y CONTEXTO
 # ==========================================
 with tab_intro:
-    st.header("📌 Trabajo Fin de Grado: Dashboard y Analítica de Datos Clínicos")
-    
-    col_a, col_b = st.columns([2, 1])
-    
-    with col_a:
-        st.subheader("Objetivo del Proyecto")
-        st.write("""
-        Este proyecto abarca la **migración y escalado de un almacén de datos clínicos a la nube de Azure**, 
-        junto con el diseño de una capa semántica de vistas en SQL Server y la implementación de un 
-        dashboard interactivo en Python (Streamlit).
-        
-        La plataforma está dividida en dos bloques analíticos:
-        1. **Analítica Descriptiva (DW):** Exploración multidimensional de ingresos en UCI, demografía, comorbilidades y signos vitales.
-        2. **Analítica Predictiva (Data Mining):** Descubrimiento de patrones mediante modelos de machine learning.
-        """)
-        
-    with col_b:
-        st.subheader("🛠️ Tecnologías")
-        st.markdown("""
-        - **Data Warehouse:** Azure SQL / SQL Server
-        - **Frontend:** Streamlit
-        - **Visualización:** Plotly Express
-        - **Procesamiento:** Pandas & Python
-        """)
+    introduction.render_intro()
 
 # ==========================================
 # PESTAÑA 2: DATA WAREHOUSE
@@ -233,7 +211,7 @@ with tab_clustering:
 
     st.divider()
  
-    charts_clustering.render_comorbidity_and_vitals_heatmaps(df_clustering_filtered, columna_cluster)
+    charts_clustering.render_comorbidity_heatmap(df_clustering_filtered, columna_cluster)
 
     st.divider()
 
@@ -242,3 +220,9 @@ with tab_clustering:
         charts_clustering.render_radar_chart(df_clustering_filtered, columna_cluster, color_map_cluster)
     with col4:
         charts_clustering.render_pca_scatter(df_clustering_filtered, columna_cluster, color_map_cluster)
+
+# ==========================================
+# PESTAÑA 6: GUÍA DE LECTURA
+# ==========================================
+with tab_ayuda:
+    help.render_help()
