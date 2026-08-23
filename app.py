@@ -55,7 +55,7 @@ st.title("📊 Plataforma de Analítica Clínica y Minería de Datos")
 
 # Definición de las Pestañas Principales
 tab_intro, tab_dw, tab_mortalidad, tab_estancia, tab_clustering, tab_ayuda = st.tabs([
-    "ℹ️ Introducción",
+    "ℹ️ Introducción y Arquitectura",
     "🏥 Analítica Descriptiva", 
     "🎯 Clasificación de Mortalidad en UCI",
     "🏨 Regresión de Estancia en UCI",
