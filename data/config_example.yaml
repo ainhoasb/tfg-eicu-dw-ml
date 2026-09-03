@@ -1,0 +1,13 @@
+active_connection: 'azure_sql'
+
+azure_sql:
+  server: 'TU_SERVIDOR.database.windows.net'
+  database: 'DW_TFG'
+  username: 'TU_USUARIO'
+  password: 'TU_CONTRASEÑA'
+  driver: '{ODBC Driver 17 for SQL Server}'
+
+local_sql:
+  server: 'localhost'
+  database: 'DW_TFG'
+  driver: '{ODBC Driver 17 for SQL Server}'
