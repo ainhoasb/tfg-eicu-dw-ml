@@ -75,7 +75,7 @@ def render_sidebar(df_general):
         st.divider()
 
         st.subheader("❤️ Estado al Alta")
-        opciones_estado = [("Vivo", 0), ("Fallecido", 1)]
+        opciones_estado = [("Egreso vivo", 0), ("Fallecido", 1)]
         selected_died = []
         for etiqueta, valor in opciones_estado:
             if st.checkbox(etiqueta, value=True, key=f"died_{valor}"):
