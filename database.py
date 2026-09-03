@@ -8,16 +8,28 @@ warnings.filterwarnings('ignore', category=UserWarning)
 
 def get_connection():
     with open('data/config.yaml', 'r') as file:
-        db_config = yaml.safe_load(file)['azure_sql']
+        config = yaml.safe_load(file)['azure_sql']
     
-    connection_string = (
-        f"DRIVER={db_config['driver']};"
-        f"SERVER={db_config['server']};"
-        f"PORT=1433;"
-        f"DATABASE={db_config['database']};"
-        f"UID={db_config['username']};"
-        f"PWD={db_config['password']}"
-    )
+    modo = config['active_connection']
+    db_config = config[modo]
+
+    if modo == 'azure_sql':
+        connection_string = (
+            f"DRIVER={db_config['driver']};"
+            f"SERVER={db_config['server']};"
+            f"PORT=1433;"
+            f"DATABASE={db_config['database']};"
+            f"UID={db_config['username']};"
+            f"PWD={db_config['password']}"
+        )
+    else:  # local_sql, con Windows Authentication
+        connection_string = (
+            f"DRIVER={db_config['driver']};"
+            f"SERVER={db_config['server']};"
+            f"DATABASE={db_config['database']};"
+            f"Trusted_Connection=yes;"
+        )
+
     return pyodbc.connect(connection_string)
 
 @st.cache_data
