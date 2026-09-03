@@ -22,7 +22,7 @@ def categorizar_presion(row):
         return "Óptima / Normal"
 
 def render_bp_scatter(df_bp):
-    st.subheader("🩸 Presión Arterial Sistólica vs Diastólica")
+    st.subheader("🩸 Presión Arterial Sistólica frente a Diastólica")
 
     if df_bp.empty or 'Systolic' not in df_bp.columns or 'Diastolic' not in df_bp.columns:
         st.info("Datos insuficientes para generar el diagrama de dispersión de la Presión Arterial.")

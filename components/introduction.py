@@ -67,7 +67,7 @@ def render_intro():
         - **📊 Clustering de Fenotipos:** modelo no supervisado que agrupa a los pacientes en
           fenotipos clínicos según su perfil al ingreso, validado después con la mortalidad real.
         - **❓ Guía de Lectura:** explicación de términos y de cómo interpretar las gráficas más
-          técnicas (SHAP, deciles de gravedad, z-score, PCA...), organizada por pestaña.
+          técnicas (SHAP, deciles de gravedad, PCA...), organizada por pestaña.
         """
     )
 
@@ -76,11 +76,11 @@ def render_intro():
     st.subheader("⚠️ Alcance y Limitaciones")
     st.markdown(
         """
-        - Los tres modelos se entrenaron sobre un **Gold Dataset de 162.009 ingresos**; los
-          resultados que ves en sus pestañas provienen del conjunto de test (o del dataset
+        - Los tres modelos se entrenaron sobre un **Gold Dataset de 162.009 ingresos**. Los
+          resultados que se ven en sus pestañas provienen del conjunto de test (o del dataset
           completo en el caso del clustering, al ser no supervisado).
-        - La vista del **Data Warehouse** (pestaña "Analítica Descriptiva") está limitada
-          actualmente a una muestra de desarrollo -- ajusta el `TOP` de las consultas en
+        - Algunas vistas del **Data Warehouse** (pestaña "Analítica Descriptiva") están limitadas
+          actualmente a una muestra, se debe ajustar el `TOP` de las consultas en
           `database.py` si necesitas explotar el DW completo.
         - Este dashboard es un **proyecto académico con fines didácticos**.
         """

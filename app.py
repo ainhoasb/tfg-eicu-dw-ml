@@ -76,7 +76,7 @@ with tab_dw:
     render_kpis(df_filtered)
     st.divider()
 
-    render_treemap(df_filtered)
+    render_treemap(df_filtered, 10)
 
     col1, col2 = st.columns(2)
     with col1:

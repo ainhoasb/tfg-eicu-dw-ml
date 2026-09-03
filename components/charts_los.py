@@ -152,7 +152,7 @@ def render_kpis(df: pd.DataFrame, codigo_poblacion: str):
  
  
 def render_distribution_comparison(df: pd.DataFrame, codigo_poblacion: str):
-    """Histogramas superpuestos comparando estancia real vs. predicha, en conteo absoluto de ingresos.
+    """Histogramas superpuestos comparando estancia real frente a la predicha, en conteo absoluto de ingresos.
  
     La estancia real ya es un valor entero. Para que la comparación sea justa, la predicha (continua, salida 
     directa del modelo) se redondea con la misma lógica de truncamiento antes de graficar.
@@ -236,7 +236,7 @@ def render_residuals_scatter(df: pd.DataFrame, codigo_poblacion: str):
         y="residuo",
         opacity=0.25,
         labels={"y_pred_dias": "Estancia predicha (días)", "residuo": "Residuo (real - predicho)"},
-        title="Residuos vs. Valor Predicho",
+        title="Residuos frente a Valor Predicho",
     )
     fig.add_hline(y=0, line_dash="dash", line_color="red")
     st.plotly_chart(fig, use_container_width=True)

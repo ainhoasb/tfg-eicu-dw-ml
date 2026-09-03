@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import streamlit as st
 import pandas as pd
 
-def render_treemap(df):
+def render_treemap(df, top_n_hospitales=10):
     st.subheader("Distribución Jerárquica (Región > Hospital > Servicio)")
     
     # Columnas esperadas de la vista
@@ -35,13 +35,24 @@ def render_treemap(df):
     df_grouped = df_tree.groupby(path_cols).size().reset_index(name='Total Ingresos')
     df_grouped = df_grouped[df_grouped['Total Ingresos'] > 0]
 
+    # Limitar a los N hospitales con más ingresos totales (sumando todos sus
+    # servicios), para no saturar el treemap si hay muchos hospitales.
+    if 'Hospital_Label' in df_grouped.columns:
+        top_hospitales = (
+            df_grouped.groupby('Hospital_Label')['Total Ingresos']
+            .sum()
+            .nlargest(top_n_hospitales)
+            .index
+        )
+        df_grouped = df_grouped[df_grouped['Hospital_Label'].isin(top_hospitales)]
+
     fig = px.treemap(
         df_grouped,
         path=path_cols,
         values='Total Ingresos',
         color='Total Ingresos',
         color_continuous_scale='Blues',
-        title="Navegación visual por región, centro sanitario y servicio médico"
+        title="Navegación visual por región, hospital y servicio médico"
     )
 
     fig.update_traces(
