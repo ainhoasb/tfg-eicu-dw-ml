@@ -4,7 +4,7 @@ import yaml
 
 # 1. Cargar las credenciales desde el archivo YAML
 try:
-    with open('config.yaml', 'r') as file:
+    with open('data/config.yaml', 'r') as file:
         config = yaml.safe_load(file)
         
     db_config = config['azure_sql']

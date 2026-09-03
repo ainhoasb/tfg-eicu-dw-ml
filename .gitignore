@@ -3,6 +3,12 @@ venv/
 env/
 venv_tfg/
 images/
+notebooks/datos_procesados
+data/config.yaml
+data/*.parquet
+
+notebooks/0ld
+
 
 # Archivos de caché de Python
 __pycache__/

@@ -22,7 +22,7 @@ def categorizar_presion(row):
         return "Óptima / Normal"
 
 def render_bp_scatter(df_bp):
-    st.subheader("🩸 Presión Arterial Sistólica vs Diastólica")
+    st.subheader("🩸 Presión Arterial Sistólica frente a Diastólica")
 
     if df_bp.empty or 'Systolic' not in df_bp.columns or 'Diastolic' not in df_bp.columns:
         st.info("Datos insuficientes para generar el diagrama de dispersión de la Presión Arterial.")
@@ -47,14 +47,14 @@ def render_bp_scatter(df_bp):
         y="Systolic",
         color="Estado Clínico",
         color_discrete_map=color_map,
-        hover_data=["PatientUnitStayID"], # <--- Añade el ID del paciente al tooltip
+        hover_data=["PatientUnitStayID"], # <--- Añade el ID del ingreso al tooltip
         opacity=0.75,
         title="Clasificación del Riesgo Cardiovascular"
     )
 
     # Personalizar la etiqueta flotante (tooltip) para que sea más limpia
     fig.update_traces(
-        hovertemplate="<b>Paciente ID: %{customdata[0]}</b><br>" +
+        hovertemplate="<b>Ingreso ID: %{customdata[0]}</b><br>" +
                       "Sistólica: %{y} mmHg<br>" +
                       "Diastólica: %{x} mmHg<br>"
     )
