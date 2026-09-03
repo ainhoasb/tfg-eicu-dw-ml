@@ -349,7 +349,6 @@ def render_comorbidity_heatmap(df: pd.DataFrame, columna_cluster: str):
     if ordenar_por_carga:
         orden = tabla_comorb.sum(axis=1).sort_values(ascending=False).index
         tabla_comorb = tabla_comorb.loc[orden]
-        tabla_vitales_z = tabla_vitales_z.loc[orden]
  
     tabla_comorb_t = tabla_comorb.T
     tabla_comorb_t.columns = [f"Clúster {c}" for c in tabla_comorb_t.columns]
