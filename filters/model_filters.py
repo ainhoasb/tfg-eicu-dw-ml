@@ -31,6 +31,11 @@ def filter_model_df(df: pd.DataFrame, filters: dict) -> pd.DataFrame:
     if "Age" in df_filtrado.columns and filters.get("age_range"):
         edad_min, edad_max = filters["age_range"]
         df_filtrado = df_filtrado[df_filtrado["Age"].between(edad_min, edad_max)]
+
+    if filters.get("died_in_hospital"):
+            columna_mortalidad = "DiedInHospital" if "DiedInHospital" in df_filtrado.columns else "y_true"
+            if columna_mortalidad in df_filtrado.columns:
+                df_filtrado = df_filtrado[df_filtrado[columna_mortalidad].isin(filters["died_in_hospital"])]
  
     if "Gender" in df_filtrado.columns and filters.get("genders"):
         df_filtrado = df_filtrado[
@@ -47,5 +52,7 @@ def filter_model_df(df: pd.DataFrame, filters: dict) -> pd.DataFrame:
  
     if "Service" in df_filtrado.columns and filters.get("services"):
         df_filtrado = df_filtrado[df_filtrado["Service"].isin(filters["services"])]
+
+    
  
     return df_filtrado

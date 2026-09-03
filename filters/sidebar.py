@@ -51,6 +51,8 @@ def render_sidebar(df_general):
         if st.button("🔄 Restablecer filtros", use_container_width=True):
             for year in available_years:
                 st.session_state[f"year_{year}"] = True
+            for _, valor in opciones_estado:
+                st.session_state[f"died_{valor}"] = True
             for gender in available_genders:
                 st.session_state[f"gender_{gender}"] = True
             st.session_state["ethnicities_filter"] = available_ethnicities
@@ -69,6 +71,15 @@ def render_sidebar(df_general):
         for year in available_years:
             if st.checkbox(str(int(year)), value=True, key=f"year_{year}"):
                 selected_years.append(year)
+
+        st.divider()
+
+        st.subheader("❤️ Estado al Alta")
+        opciones_estado = [("Vivo", 0), ("Fallecido", 1)]
+        selected_died = []
+        for etiqueta, valor in opciones_estado:
+            if st.checkbox(etiqueta, value=True, key=f"died_{valor}"):
+                selected_died.append(valor)
 
         st.divider()
 
@@ -121,5 +132,6 @@ def render_sidebar(df_general):
         "ethnicities": selected_ethnicities,
         "regions": selected_regions,
         "units": selected_units,
-        "services": selected_services
+        "services": selected_services,
+        "died_in_hospital": selected_died,
     }

@@ -32,7 +32,8 @@ mask = (
     df_admitted['Age'].between(filters['age_range'][0], filters['age_range'][1]) &
     df_admitted['Region'].isin(filters['regions']) &
     df_admitted['UnitType'].isin(filters['units']) &
-    df_admitted['Service'].isin(filters['services'])
+    df_admitted['Service'].isin(filters['services']) &
+    df_admitted['DiedInHospital'].isin(filters['died_in_hospital'])
 )
 
 df_filtered = df_admitted[mask]
