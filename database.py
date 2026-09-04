@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore', category=UserWarning)
 
 def get_connection():
     with open('data/config.yaml', 'r') as file:
-        config = yaml.safe_load(file)['azure_sql']
+        config = yaml.safe_load(file)
     
     modo = config['active_connection']
     db_config = config[modo]
