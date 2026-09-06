@@ -4,17 +4,21 @@ env/
 venv_tfg/
 images/
 notebooks/datos_procesados
-data/config.yaml
-data/*.parquet
 
 notebooks/0ld
-
 
 # Archivos de caché de Python
 __pycache__/
 *.pyc
 
-# Variables de entorno (¡nunca subas contraseñas!)
+# Variables de entorno
 .env
-
 config.yml
+
+# Dashboard: credenciales y resultados generados por los notebooks
+dashboard/data/config.yaml
+dashboard/data/*.parquet
+
+# data/: solo el README con el puntero a Azure, nunca archivos reales
+data/*
+!data/README.md
