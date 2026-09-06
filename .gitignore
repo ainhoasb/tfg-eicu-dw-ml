@@ -22,3 +22,10 @@ dashboard/data/*.parquet
 # data/: solo el README con el puntero a Azure, nunca archivos reales
 data/*
 !data/README.md
+
+# Proyectos SSIS (ETL): artefactos de compilación temporales
+**/obj/
+*.dtproj.user
+
+# Visual Studio: caché de la sesión, no forma parte del proyecto
+**/.vs/
