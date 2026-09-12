@@ -2,7 +2,6 @@
 venv/
 env/
 venv_tfg/
-images/
 notebooks/datos_procesados
 
 notebooks/0ld
