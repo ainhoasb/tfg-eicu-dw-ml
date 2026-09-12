@@ -46,6 +46,7 @@ def render_sidebar(df_general):
         regions = sorted(df_general['Region'].dropna().unique())
         unit_types = sorted(df_general['UnitType'].dropna().unique())
         services = sorted(df_general['Service'].dropna().unique())
+        opciones_estado = [("Egreso vivo", 0), ("Fallecido", 1)]
 
         # Botón de Restablecer filtros
         if st.button("🔄 Restablecer filtros", use_container_width=True):
@@ -75,7 +76,6 @@ def render_sidebar(df_general):
         st.divider()
 
         st.subheader("❤️ Estado al Alta")
-        opciones_estado = [("Egreso vivo", 0), ("Fallecido", 1)]
         selected_died = []
         for etiqueta, valor in opciones_estado:
             if st.checkbox(etiqueta, value=True, key=f"died_{valor}"):
