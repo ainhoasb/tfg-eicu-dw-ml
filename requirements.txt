@@ -6,3 +6,6 @@ shap==0.49.1
 pyarrow<25,>=14  # <25 por streamlit==1.61.1 (dashboard-TFG); cualquier versión en ese rango vale para read_parquet
 matplotlib==3.9.2
 seaborn==0.13.2
+pyodbc==5.3.0
+PyYAML==6.0.3
+Jinja2==3.1.6
